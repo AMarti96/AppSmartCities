@@ -17,7 +17,7 @@
 
 <div class="switch">
   <button ion-button color="light" (click)="(switch = 'map'); resizeMap()" [class.active]="(switch == 'map')" icon-only><ion-icon name="map"></ion-icon></button>
-  <button ion-button color="light" (click)="(switch = 'list'); " [class.active]="(switch == 'list')" icon-only><ion-icon name="list"></ion-icon></button>
+  <button *ngIf="loadi===false" ion-button color="light" (click)="(switch = 'list'); " [class.active]="(switch == 'list')" icon-only><ion-icon name="list"></ion-icon></button>
 </div>
 
 <div class="currentitem" *ngIf="currentregional">
@@ -45,7 +45,12 @@
 
   <div class="map" [class.hidemap]="!((switch == 'map') || error)">
     <ion-searchbar #searchbar placeholder="Buscar" [hidden]="!search"></ion-searchbar>
-    <div *ngIf="parking===true">
+    <div *ngIf="loadi===true">
+      <ion-fab top right #fab>
+      <button ion-fab><ion-icon name="clock"></ion-icon></button>
+    </ion-fab>
+    </div>
+    <div *ngIf="parking===true&&loadi===false">
       <ion-fab top right #fab>
         <button ion-fab>Park!</button>
         <ion-fab-list side="bottom">

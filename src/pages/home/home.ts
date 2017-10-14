@@ -22,6 +22,7 @@ export class HomePage {
   listSearch: string = '';
   category:any;
   map: any;
+  loadi:any;
   marker: any;
   loading: any;
   search: boolean = false;
@@ -48,6 +49,8 @@ export class HomePage {
   ) {
     this.url='34.253.145.31';
     this.parking=false;
+    this.loadi=false;
+    this.category='Welcome';
     this.platform.ready().then(() =>
       this.loadMaps());
     this.regionals = [{
@@ -720,7 +723,7 @@ export class HomePage {
     });
   }
   filterpark(number){
-
+    this.loadi=true;
     this.geolocation.getCurrentPosition().then(
       (position) => {
           let data = { lat: position.coords.latitude, lon: position.coords.longitude };
@@ -733,6 +736,7 @@ export class HomePage {
           }
 
           this.getpositionparquing(locations,observations);
+          this.loadi=false;
           this.switch = "map";
         });
       },
