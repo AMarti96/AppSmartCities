@@ -4,8 +4,6 @@ import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {GoogleMap, GoogleMapsAnimation, GoogleMapsEvent, GoogleMapsLatLng, Geolocation, GoogleMapsMarkerOptions, GoogleMapsMarker, CameraPosition} from 'ionic-native';
 
-declare var google;
-
 @Component({
   selector: 'page-about',
   templateUrl: 'about.html'
@@ -18,13 +16,12 @@ export class AboutPage {
   constructor(public navCtrl: NavController, private platform: Platform, public http:Http) {
     platform.ready().then(() => {
       this.loadMap();
+      console.log("Mapa cargado")
     });
   }
 
-
-
   loadMap(){
-    let location: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
+    let location = new GoogleMapsLatLng(-34.9290,138.6010);
 
     this.map = new GoogleMap('map', {
       'backgroundColor': 'white',
@@ -49,27 +46,9 @@ export class AboutPage {
     });
 
     this.map.on(GoogleMapsEvent.MAP_READY).subscribe(() => {
-      // create CameraPosition
-      let position: CameraPosition = {
-        target: location,
-        zoom: 18,
-        tilt: 30
-      };
-
-      // move the map's camera to position
-      this.map.moveCamera(position);
-
-      // create new marker
-      let markerOptions: GoogleMapsMarkerOptions = {
-        position: location,
-        title: 'Ionic'
-      };
-
-      this.map.addMarker(markerOptions)
-        .then((marker: GoogleMapsMarker) => {
-          marker.showInfoWindow();
-        });
+      console.log('Map is ready!');
     });
+
   }
 
 }
