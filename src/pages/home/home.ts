@@ -30,6 +30,7 @@ export class HomePage {
   location:any;
   regionals: any = [];
   currentregional: any;
+  circles: any = [];
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -140,6 +141,15 @@ export class HomePage {
           //sub.complete();
         }
       });
+    });
+  }
+
+  followlocation(){
+
+    console.log("empiezo a seguir posicion")
+
+    const watch = this.geolocation.watchPosition().subscribe(pos => {
+      console.log('lat: ' + pos.coords.latitude + ', lon: ' + pos.coords.longitude);
     });
   }
 
@@ -319,6 +329,7 @@ export class HomePage {
         this.loading.dismiss().then(() => {
 
           this.showToast('Location found!');
+          console.log("consegui posicion");
 
           let myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
           let options = {
@@ -331,7 +342,7 @@ export class HomePage {
                   let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
                   this.storage.set('lastLocation', lastLocation).then(() => {
                   });
-
+          this.followlocation();
         });
       },
       (error) => {
@@ -351,6 +362,41 @@ export class HomePage {
       this.search = true;
     }
   }
+
+  getposition(pos){
+
+    let positions = [];
+    for(let i = 0; i<pos.length;i++){
+      let posi=pos[i].split(" ");
+      positions[i]= new google.maps.LatLng(posi[0],posi[1]);
+    }
+    this.addCircle(positions);
+  }
+
+  /*
+  * addCircle(positions){
+
+    for(let i = 0;i<this.circles.length;i++){
+      this.circles[i].setMap(null);
+    }
+
+   for(let i = 0; i<positions.length;i++){
+
+     this.circles[i] = new google.maps.Circle({
+       strokeColor: '#FF0000',
+       strokeOpacity: 0.8,
+       strokeWeight: 2,
+       fillColor: '#FF0000',
+       fillOpacity: 0.35,
+       map: this.map,
+       center: positions[i],
+       radius: 250
+     });
+   }
+
+  }
+  *
+  * */
 
   addCircle(position,level){
     let posi=position.split(" ");
@@ -405,6 +451,8 @@ export class HomePage {
     }
   }
 
+
+
   addMarker(position, content) {
 
     let marker = new google.maps.Marker({
@@ -424,12 +472,31 @@ export class HomePage {
         }
       });
   }
+  /*
+  * getallaire(){
+    console.log("aire cogido");
+    this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+      var locations = [];
+      for (let i=0;i<result.sensors.length;i++){
+        locations[i] = result.sensors[i].observations[0].location;
+      }
+      this.getposition(locations);
+      this.switch = "map"
+    });
+  }
+  *
+  * */
 
   getallparquing(){
-    console.log("parquing cogido")
-    //this.http.get('http://10.193.44.74:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
-    //console.log(result)
-    //});
+    console.log("parquing cogido");
+    this.http.get('http://10.192.53.5:3500/parking/6d61736d69').map(res=>res.json()).subscribe(result=>{
+      var locations = [];
+      for (let i=0;i<result.sensors.length;i++){
+        locations[i] = result.sensors[i].observations[0].location;
+      }
+      this.getposition(locations);
+      this.switch = "map"
+    });
   }
 
   addInfoWindow(marker, content) {

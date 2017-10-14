@@ -7,7 +7,7 @@
       <button ion-button icon-only (click)='toggleSearch()'>
         <ion-icon name="search"></ion-icon>
       </button>
-      <button ion-button icon-only (click)='choosePosition()'>
+      <button ion-button icon-only (click)='getCurrentPosition()'>
         <ion-icon name="ios-locate-outline"></ion-icon>
       </button>
     </ion-buttons>
@@ -31,10 +31,10 @@
   <div [hidden]="!(switch == 'list')">
     <ion-list>
       <ion-item>
-        <h2 (click)="getallaire()">Contaminación Aire</h2>
+        <h2 (click)="getallaire()"><ion-icon name="cloudy">  Contaminación Aire</ion-icon></h2>
       </ion-item>
       <ion-item>
-        <h2 (click)="getallparquing()">Parquing disponible</h2>
+        <h2 (click)="getallparquing()"><ion-icon name="car">   Parquing disponible</ion-icon></h2>
       </ion-item>
     </ion-list>
   </div>
