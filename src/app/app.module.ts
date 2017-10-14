@@ -12,7 +12,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import {HttpModule} from "@angular/http";
 import "rxjs/add/operator/map";
-import {GoogleMaps} from "@ionic-native/google-maps";
+import { Geolocation } from '@ionic-native/geolocation';
+import { GoogleMaps } from '@ionic-native/google-maps';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import {GoogleMaps} from "@ionic-native/google-maps";
   providers: [
     StatusBar,
     SplashScreen,
+    Geolocation,
     GoogleMaps,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
