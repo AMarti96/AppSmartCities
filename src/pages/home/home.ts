@@ -44,9 +44,6 @@ export class HomePage {
     public geolocation: Geolocation,
     public http:Http
   ) {
-    //this.http.get('http://10.193.44.74:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
-    //console.log(result)
-    //});
     this.platform.ready().then(() => this.loadMaps());
     this.regionals = [{
       "title": "Marker 1",
@@ -262,6 +259,8 @@ export class HomePage {
     }, 200);
   }
 
+
+
   showToast(message) {
     let toast = this.toastCtrl.create({
       message: message,
@@ -328,16 +327,7 @@ export class HomePage {
           };
           this.map.setOptions(options);
           this.addMarker(myPos, "My location!");
-          var cityCircle = new google.maps.Circle({
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: '#FF0000',
-            fillOpacity: 0.35,
-            map: this.map,
-            center: myPos,
-            radius: 250
-          });
+
                   let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
                   this.storage.set('lastLocation', lastLocation).then(() => {
                   });
@@ -362,7 +352,23 @@ export class HomePage {
     }
   }
 
+  addCircle(position){
+    let posi=position.split(" ");
+    let pos= new google.maps.LatLng(posi[0],posi[1]);
+    var cityCircle = new google.maps.Circle({
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35,
+      map: this.map,
+      center: pos,
+      radius: 250
+    });
+  }
+
   addMarker(position, content) {
+
     let marker = new google.maps.Marker({
       map: this.map,
       animation: google.maps.Animation.DROP,
@@ -374,10 +380,11 @@ export class HomePage {
   }
 
   getallaire(){
-    console.log("aire cogido")
-    //this.http.get('http://10.193.44.74:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
-    //console.log(result)
-    //});
+    this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+      for (let i=0;i<result.sensors.length;i++){
+        this.addCircle(result.sensors[i].observations[0].location);
+      }
+    });
   }
 
   getallparquing(){
