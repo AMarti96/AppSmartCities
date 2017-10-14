@@ -18,7 +18,7 @@ export class HomePage {
   @ViewChild('map') mapElement: ElementRef;
   @ViewChild('searchbar', { read: ElementRef }) searchbar: ElementRef;
   addressElement: HTMLInputElement = null;
-
+  url:any;
   listSearch: string = '';
   category:any;
   map: any;
@@ -46,32 +46,50 @@ export class HomePage {
     public geolocation: Geolocation,
     public http:Http
   ) {
+    this.url='34.253.145.31';
     this.parking=false;
     this.platform.ready().then(() =>
       this.loadMaps());
     this.regionals = [{
-      "title": "Marker 1",
-      "latitude": 52.50094,
-      "longitude": 13.29922,
-    }, {
-      "title": "Marker 2",
-      "latitude": 49.1028606,
-      "longitude": 9.8426116
+
     }];
 
-    /*this.socket = io('http://localhost:3000');
+    this.socket = io('http://'+this.url+':3500');
     this.socket.on('newco2', (msg) => {
-      console.log("message", msg);
-
+      let posi=msg.location.split(" ");
+      let position= new google.maps.LatLng(posi[0],posi[1]);
+      for(let i=0;i<this.circles.length;i++){
+        if (this.circles[i].position.lat()==posi[0]&&this.circles[i].position.lng()==posi[1]){
+          this.circles[i].circle.setMap(null);
+          this.circles[i].circle='';
+          this.editCircleaire(position,msg.message,i);
+        }
+      }
     });
     this.socket.on('newparking', (msg) => {
-      console.log("message", msg);
+      let posi=msg.location.split(" ");
+      let position= new google.maps.LatLng(posi[0],posi[1]);
+      for(let i=0;i<this.circles.length;i++){
+        if (this.circles[i].position.lat()==posi[0]&&this.circles[i].position.lng()==posi[1]){
+          this.circles[i].circle.setMap(null);
+          this.circles[i].circle='';
+          this.editCircleparquing(position,msg.message,i);
+        }
+      }
 
     });
     this.socket.on('newpeople', (msg) => {
-      console.log("message", msg);
+      let posi=msg.location.split(" ");
+      let position= new google.maps.LatLng(posi[0],posi[1]);
+      for(let i=0;i<this.circles.length;i++){
+        if (this.circles[i].position.lat()==posi[0]&&this.circles[i].position.lng()==posi[1]){
+          this.circles[i].circle.setMap(null);
+          this.circles[i].circle='';
+          this.editCirclepeople(position,msg.message,i);
+        }
+      }
 
-    });*/
+    });
   }
 
   viewPlace(id) {
@@ -126,7 +144,6 @@ export class HomePage {
   }
 
   initAutocomplete(): void {
-    // reference : https://github.com/driftyco/ionic/issues/7223
     this.addressElement = this.searchbar.nativeElement.querySelector('.searchbar-input');
     this.createAutocomplete(this.addressElement).subscribe((location) => {
       console.log('Searchdata', location);
@@ -155,7 +172,6 @@ export class HomePage {
           console.log('Search Lat', place.geometry.location.lat());
           console.log('Search Lng', place.geometry.location.lng());
           sub.next(place.geometry.location);
-          //sub.complete();
         }
       });
     });
@@ -184,74 +200,6 @@ export class HomePage {
         scaleControl: true,
       });
       this.getCurrentPosition();
-      /*let markers = [];
-      for (let regional of this.regionals) {
-        regional.distance = 0;
-        regional.visible = false;
-        regional.current = false;
-
-        let markerData = {
-          position: {
-            lat: regional.latitude,
-            lng: regional.longitude
-          },
-          map: this.map,
-          title: regional.title,
-        };
-
-        regional.marker = new google.maps.Marker(markerData);
-        markers.push(regional.marker);
-
-        regional.marker.addListener('click', () => {
-          for (let c of this.regionals) {
-            c.current = false;
-            //c.infoWindow.close();
-          }
-          this.currentregional = regional;
-          regional.current = true;
-
-          //regional.infoWindow.open(this.map, regional.marker);
-          this.map.panTo(regional.marker.getPosition());
-        });
-      }
-
-      new MarkerClusterer(this.map, markers, {
-        styles: [
-          {
-            height: 53,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 53,
-            textColor: '#fff'
-          },
-          {
-            height: 56,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 56,
-            textColor: '#fff'
-          },
-          {
-            height: 66,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 66,
-            textColor: '#fff'
-          },
-          {
-            height: 78,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 78,
-            textColor: '#fff'
-          },
-          {
-            height: 90,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 90,
-            textColor: '#fff'
-          }
-        ]
-      });*/
-
-
-
 
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
         google.maps.event.trigger(this.map, 'resize');
@@ -268,9 +216,6 @@ export class HomePage {
 
     });
   }
-
-  //Center zoom
-  //http://stackoverflow.com/questions/19304574/center-set-zoom-of-map-to-cover-all-visible-markers
   bounceMap(markers) {
     let bounds = new google.maps.LatLngBounds();
 
@@ -412,6 +357,7 @@ export class HomePage {
     for (let i = 0; i < this.circles.length; i++) {
       this.circles[i].circle.setMap(null);
     }
+    this.circles=[];
     for (let i = 0; i < positions.length; i++) {
 
       if (level[i] >= 0 && level[i] < 700) {
@@ -423,7 +369,7 @@ export class HomePage {
           fillOpacity: 0.35,
           map: this.map,
           center: positions[i],
-          radius: 50
+          radius: 80
         });
         this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
@@ -436,7 +382,7 @@ export class HomePage {
           fillOpacity: 0.35,
           map: this.map,
           center: positions[i],
-          radius: 50
+          radius: 80
         });
         this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
@@ -449,7 +395,7 @@ export class HomePage {
           fillOpacity: 0.35,
           map: this.map,
           center: positions[i],
-          radius: 50
+          radius: 80
         });
         this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
@@ -460,6 +406,7 @@ export class HomePage {
     for (let i = 0; i < this.circles.length; i++) {
       this.circles[i].circle.setMap(null);
     }
+    this.circles=[];
     for (let i = 0; i < positions.length; i++) {
 
       if (level[i] >= 350 && level[i] < 1000) {
@@ -580,7 +527,7 @@ export class HomePage {
       this.circles[index].circle=circle;
     }
     if (level <= 30 && level > 10) {
-      new google.maps.Circle({
+      let circle=new google.maps.Circle({
         strokeColor: '#f7f71b',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -590,9 +537,10 @@ export class HomePage {
         center: position,
         radius: 250
       });
+      this.circles[index].circle=circle;
     }
     if (level <= 10) {
-       new google.maps.Circle({
+       let circle= new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -602,7 +550,105 @@ export class HomePage {
         center: position,
         radius: 250
       });
+      this.circles[index].circle=circle;
     }
+  }
+
+  editCircleaire(positions,level,index) {
+      if (level >= 350 && level < 1000) {
+        let circle = new google.maps.Circle({
+          strokeColor: '#5ff442',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#5ff442',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 250
+        });
+        this.circles[index].circle=circle;
+      }
+      if (level >= 1000 && level < 2000) {
+        let circle= new google.maps.Circle({
+          strokeColor: '#f7f71b',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f7f71b',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 250
+        });
+        this.circles[index].circle=circle;
+      }
+      if (level >= 2000 && level < 5000) {
+        let circle = new google.maps.Circle({
+          strokeColor: '#f77707',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f77707',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 250
+        });
+        this.circles[index].circle=circle;
+      }
+      if (level > 5000) {
+       let circle = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 250
+        });
+        this.circles[index].circle=circle;
+      }
+    }
+
+  editCirclepeople(positions,level,index) {
+      if (level >= 0 && level < 700) {
+        let circle = new google.maps.Circle({
+          strokeColor: '#5ff442',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#5ff442',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 80
+        });
+        this.circles[index].circle=circle;
+      }
+      if (level >= 700 && level < 1500) {
+        let circle = new google.maps.Circle({
+          strokeColor: '#f77707',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f77707',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 80
+        });
+        this.circles[index].circle=circle;
+      }
+      if (level > 1500) {
+        let circle = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions,
+          radius: 80
+        });
+        this.circles[index].circle=circle;
+      }
   }
 
   addMarker(position, content) {
@@ -622,7 +668,7 @@ export class HomePage {
   getallaire(){
     this.parking=false;
     this.category="Air Quality";
-      this.http.get('http://10.192.53.5:80/air/sensor/air_quality_co2').map(res=>res.json()).subscribe(result=>{
+      this.http.get('http://'+this.url+'/air/sensor/air_quality_co2').map(res=>res.json()).subscribe(result=>{
         var locations = [];
         let observations=[];
         for (let i=0;i<result.length;i++){
@@ -637,7 +683,7 @@ export class HomePage {
   getallparquing(){
     this.parking=true;
     this.category="Parking Metrics";
-    this.http.get('http://10.192.53.5:80/parking/sensor/park_meter').map(res=>res.json()).subscribe(result=>{
+    this.http.get('http://'+this.url+'/parking/sensor/park_meter').map(res=>res.json()).subscribe(result=>{
       var locations = [];
       let observations=[];
       for (let i=0;i<result.length;i++){
@@ -652,7 +698,7 @@ export class HomePage {
   getallpeople(){
     this.parking=false;
     this.category="People Flow";
-    this.http.get('http://10.192.53.5:80/people/sensor/people_flow').map(res=>res.json()).subscribe(result=>{
+    this.http.get('http://'+this.url+'/people/sensor/people_flow').map(res=>res.json()).subscribe(result=>{
       var locations = [];
       let observations=[];
       for (let i=0;i<result.length;i++){
@@ -674,32 +720,11 @@ export class HomePage {
     });
   }
   filterpark(number){
-    let data={ message: '40',
-    timestamp: '14/10/2017T18:02:59',
-    topic: '/data/6772696769746f/CO2_Meter3',
-    type: 'DATA',
-    sensor: 'CO2_Meter3',
-    provider: '6772696769746f',
-    location: '41.38581022388023 2.164093270766898',
-    time: 1508004179845,
-    publisher: '6772696769746f',
-    publishedAt: 1508004179845,
-    publisherTenant: 'hack_LosMasmis',
-    tenant: 'hack_LosMasmis',
-    sender: '6772696769746f' };
-    let posi=data.location.split(" ");
-    let position= new google.maps.LatLng(posi[0],posi[1]);
-    for(let i=0;i<this.circles.length;i++){
-      if (this.circles[i].position.lat()==posi[0]&&this.circles[i].position.lng()==posi[1]){
-        this.circles[i].circle.setMap(null);
-        this.circles[i].circle='';
-        this.editCircleparquing(position,data.message,i);
-      }
-    }
+
     this.geolocation.getCurrentPosition().then(
       (position) => {
           let data = { lat: position.coords.latitude, lon: position.coords.longitude };
-        this.http.post('http://10.192.53.5:80/parking/nearParking',data).map(res=>res.json()).subscribe(result=>{
+        this.http.post('http://'+this.url+'/parking/nearParking',data).map(res=>res.json()).subscribe(result=>{
           var locations = [];
           let observations=[];
           for (let i=0;i<number;i++){
