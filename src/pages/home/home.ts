@@ -5,6 +5,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 
 import { Observable } from 'rxjs/Observable';
 import { Storage } from '@ionic/storage';
+import {Http} from "@angular/http";
 
 declare var google: any;
 declare var MarkerClusterer: any;
@@ -40,8 +41,12 @@ export class HomePage {
     public alertCtrl: AlertController,
     public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
-    public geolocation: Geolocation
+    public geolocation: Geolocation,
+    public http:Http
   ) {
+    //this.http.get('http://10.193.44.74:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+    //console.log(result)
+    //});
     this.platform.ready().then(() => this.loadMaps());
     this.regionals = [{
       "title": "Marker 1",
@@ -346,7 +351,17 @@ export class HomePage {
             zoom: 14
           };
           this.map.setOptions(options);
-          this.addMarker(myPos, "Mein Standort!");
+          this.addMarker(myPos, "My location!");
+          var cityCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: this.map,
+            center: myPos,
+            radius: 500
+          });
                   let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
                   this.storage.set('lastLocation', lastLocation).then(() => {
                     console.log(lastLocation);
