@@ -45,16 +45,16 @@
 
   <div class="map" [class.hidemap]="!((switch == 'map') || error)">
     <ion-searchbar #searchbar placeholder="Buscar" [hidden]="!search"></ion-searchbar>
-    <ion-content>
+    <div *ngIf="parking===true">
       <ion-fab top right #fab>
         <button ion-fab>Park!</button>
         <ion-fab-list side="bottom">
           <button ion-fab (click)="filterpark(1)">1</button>
-          <button ion-fab (click)="filterpark(3)">2</button>
-          <button ion-fab (click)="filterpark(5)">3</button>
+          <button ion-fab (click)="filterpark(3)">3</button>
+          <button ion-fab (click)="filterpark(5)">5</button>
         </ion-fab-list>
       </ion-fab>
-    </ion-content>
+    </div>
     <div id="map" #map>
     </div>
   </div>

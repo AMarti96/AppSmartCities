@@ -32,6 +32,7 @@ export class HomePage {
   currentregional: any;
   circles: any = [];
   socket:any = null;
+  parking:any;
   constructor(
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController,
@@ -45,6 +46,7 @@ export class HomePage {
     public geolocation: Geolocation,
     public http:Http
   ) {
+    this.parking=false;
     this.platform.ready().then(() =>
       this.loadMaps());
     this.regionals = [{
@@ -56,6 +58,7 @@ export class HomePage {
       "latitude": 49.1028606,
       "longitude": 9.8426116
     }];
+
     /*this.socket = io('http://localhost:3000');
     this.socket.on('newco2', (msg) => {
       console.log("message", msg);
@@ -388,7 +391,6 @@ export class HomePage {
     this.addCircleaire(positions,observations);
   }
   getpositionparquing(pos,observations){
-
     let positions = [];
     for(let i = 0; i<pos.length;i++){
       let posi=pos[i].split(" ");
@@ -408,7 +410,7 @@ export class HomePage {
 
   addCirclepeople(positions,level) {
     for (let i = 0; i < this.circles.length; i++) {
-      this.circles[i].setMap(null);
+      this.circles[i].circle.setMap(null);
     }
     for (let i = 0; i < positions.length; i++) {
 
@@ -423,6 +425,7 @@ export class HomePage {
           center: positions[i],
           radius: 50
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] >= 700 && level[i] < 1500) {
         this.circles[i] = new google.maps.Circle({
@@ -435,6 +438,7 @@ export class HomePage {
           center: positions[i],
           radius: 50
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] > 1500) {
         this.circles[i] = new google.maps.Circle({
@@ -447,13 +451,14 @@ export class HomePage {
           center: positions[i],
           radius: 50
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
     }
   }
 
   addCircleaire(positions,level) {
     for (let i = 0; i < this.circles.length; i++) {
-      this.circles[i].setMap(null);
+      this.circles[i].circle.setMap(null);
     }
     for (let i = 0; i < positions.length; i++) {
 
@@ -468,6 +473,7 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] >= 1000 && level[i] < 2000) {
         this.circles[i] = new google.maps.Circle({
@@ -480,6 +486,7 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] >= 2000 && level[i] < 5000) {
         this.circles[i] = new google.maps.Circle({
@@ -492,6 +499,7 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] > 5000) {
         this.circles[i] = new google.maps.Circle({
@@ -504,16 +512,17 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
     }
   }
 
   addCircleparquing(positions,level) {
     for (let i = 0; i < this.circles.length; i++) {
-      this.circles[i].setMap(null);
+      this.circles[i].circle.setMap(null);
     }
+    this.circles=[];
     for (let i = 0; i < positions.length; i++) {
-
       if (level[i] >= 30) {
         this.circles[i] = new google.maps.Circle({
           strokeColor: '#5ff442',
@@ -525,6 +534,7 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] <= 30 && level[i] > 10) {
         this.circles[i] = new google.maps.Circle({
@@ -537,6 +547,7 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
       if (level[i] <= 10) {
         this.circles[i] = new google.maps.Circle({
@@ -549,9 +560,51 @@ export class HomePage {
           center: positions[i],
           radius: 250
         });
+        this.circles[i]={circle:this.circles[i],position:positions[i]}
       }
     }
   }
+
+  editCircleparquing(position,level,index){
+    if (level > 30) {
+     let circle= new google.maps.Circle({
+        strokeColor: '#5ff442',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#5ff442',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: position,
+        radius: 250
+      });
+      this.circles[index].circle=circle;
+    }
+    if (level <= 30 && level > 10) {
+      new google.maps.Circle({
+        strokeColor: '#f7f71b',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#f7f71b',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: position,
+        radius: 250
+      });
+    }
+    if (level <= 10) {
+       new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: position,
+        radius: 250
+      });
+    }
+  }
+
   addMarker(position, content) {
 
     let marker = new google.maps.Marker({
@@ -567,13 +620,14 @@ export class HomePage {
   }
 
   getallaire(){
+    this.parking=false;
     this.category="Air Quality";
-      this.http.get('http://10.192.53.5:3500/air/sensor/6772696769746f').map(res=>res.json()).subscribe(result=>{
+      this.http.get('http://10.192.53.5:80/air/sensor/air_quality_co2').map(res=>res.json()).subscribe(result=>{
         var locations = [];
         let observations=[];
-        for (let i=0;i<result.sensors.length;i++){
-          locations[i] = result.sensors[i].observations[0].location;
-          observations[i]=result.sensors[i].observations[0].value;
+        for (let i=0;i<result.length;i++){
+          locations[i] = result[i].location;
+          observations[i]=result[i].value;
         }
         this.getpositionaire(locations,observations);
         this.switch = "map";
@@ -581,13 +635,14 @@ export class HomePage {
   }
 
   getallparquing(){
+    this.parking=true;
     this.category="Parking Metrics";
-    this.http.get('http://10.192.53.5:3500/parking/sensor/6d61736d69').map(res=>res.json()).subscribe(result=>{
+    this.http.get('http://10.192.53.5:80/parking/sensor/park_meter').map(res=>res.json()).subscribe(result=>{
       var locations = [];
       let observations=[];
-      for (let i=0;i<result.sensors.length;i++){
-        locations[i] = result.sensors[i].observations[0].location;
-        observations[i]=result.sensors[i].observations[0].value;
+      for (let i=0;i<result.length;i++){
+        locations[i] = result[i].location;
+        observations[i]=result[i].value;
       }
       this.getpositionparquing(locations,observations);
       this.switch = "map"
@@ -595,13 +650,14 @@ export class HomePage {
   }
 
   getallpeople(){
+    this.parking=false;
     this.category="People Flow";
-    this.http.get('http://10.192.53.5:3500/people/sensor/706174616461').map(res=>res.json()).subscribe(result=>{
+    this.http.get('http://10.192.53.5:80/people/sensor/people_flow').map(res=>res.json()).subscribe(result=>{
       var locations = [];
       let observations=[];
-      for (let i=0;i<result.sensors.length;i++){
-        locations[i] = result.sensors[i].observations[0].location;
-        observations[i]=result.sensors[i].observations[0].value;
+      for (let i=0;i<result.length;i++){
+        locations[i] = result[i].location;
+        observations[i]=result[i].value;
       }
       this.getpositionpeople(locations,observations);
       this.switch = "map";
@@ -618,19 +674,41 @@ export class HomePage {
     });
   }
   filterpark(number){
+    let data={ message: '40',
+    timestamp: '14/10/2017T18:02:59',
+    topic: '/data/6772696769746f/CO2_Meter3',
+    type: 'DATA',
+    sensor: 'CO2_Meter3',
+    provider: '6772696769746f',
+    location: '41.38581022388023 2.164093270766898',
+    time: 1508004179845,
+    publisher: '6772696769746f',
+    publishedAt: 1508004179845,
+    publisherTenant: 'hack_LosMasmis',
+    tenant: 'hack_LosMasmis',
+    sender: '6772696769746f' };
+    let posi=data.location.split(" ");
+    let position= new google.maps.LatLng(posi[0],posi[1]);
+    for(let i=0;i<this.circles.length;i++){
+      if (this.circles[i].position.lat()==posi[0]&&this.circles[i].position.lng()==posi[1]){
+        this.circles[i].circle.setMap(null);
+        this.circles[i].circle='';
+        this.editCircleparquing(position,data.message,i);
+      }
+    }
     this.geolocation.getCurrentPosition().then(
       (position) => {
-          let data = { lat: position.coords.latitude, long: position.coords.longitude };
-        this.http.post('http://10.192.53.5:3500/nearParking',data).map(res=>res.json()).subscribe(result=>{
-          console.log(result)
-          /*var locations = [];
+          let data = { lat: position.coords.latitude, lon: position.coords.longitude };
+        this.http.post('http://10.192.53.5:80/parking/nearParking',data).map(res=>res.json()).subscribe(result=>{
+          var locations = [];
           let observations=[];
           for (let i=0;i<number;i++){
-            locations[i] = result.sensors[i].observations[0].location;
-            observations[i]=result.sensors[i].observations[0].value;
+            locations[i] = result[i].latlon;
+            observations[i]=result[i].value;
           }
+
           this.getpositionparquing(locations,observations);
-          this.switch = "map";*/
+          this.switch = "map";
         });
       },
       (error) => {
