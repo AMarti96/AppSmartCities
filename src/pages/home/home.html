@@ -1,8 +1,9 @@
 <ion-header>
-  <ion-navbar>
+  <ion-navbar color="primary">
     <ion-title>
       SmartCity
     </ion-title>
+    <ion-note style="padding-left: 5%">{{category}}</ion-note>
     <ion-buttons end>
       <button ion-button icon-only (click)='toggleSearch()'>
         <ion-icon name="search"></ion-icon>
@@ -12,7 +13,6 @@
       </button>
     </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
 <div class="switch">
@@ -31,16 +31,31 @@
   <div [hidden]="!(switch == 'list')">
     <ion-list>
       <ion-item>
-        <h2 (click)="getallaire()"><ion-icon name="cloudy">  Contaminación Aire</ion-icon></h2>
+        <h2 (click)="getallaire()"><ion-icon name="cloudy">Air Quality</ion-icon></h2>
       </ion-item>
       <ion-item>
-        <h2 (click)="getallparquing()"><ion-icon name="car">   Parquing disponible</ion-icon></h2>
+        <h2 (click)="getallparquing()"><ion-icon name="car">Parking Metrics</ion-icon></h2>
       </ion-item>
+      <ion-item>
+        <h2 (click)="getallpeople()"><ion-icon name="people">People Flow</ion-icon></h2>
+      </ion-item>
+
     </ion-list>
   </div>
 
   <div class="map" [class.hidemap]="!((switch == 'map') || error)">
     <ion-searchbar #searchbar placeholder="Buscar" [hidden]="!search"></ion-searchbar>
-    <div id="map" #map></div>
+    <ion-content>
+      <ion-fab top right #fab>
+        <button ion-fab>Park!</button>
+        <ion-fab-list side="bottom">
+          <button ion-fab (click)="filterpark(1)">1</button>
+          <button ion-fab (click)="filterpark(3)">2</button>
+          <button ion-fab (click)="filterpark(5)">3</button>
+        </ion-fab-list>
+      </ion-fab>
+    </ion-content>
+    <div id="map" #map>
+    </div>
   </div>
 </ion-content>

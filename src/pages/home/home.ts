@@ -2,7 +2,7 @@ import { identifierModuleUrl } from '@angular/compiler/compiler';
 import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
-
+import * as io from 'socket.io-client';
 import { Observable } from 'rxjs/Observable';
 import { Storage } from '@ionic/storage';
 import {Http} from "@angular/http";
@@ -20,7 +20,7 @@ export class HomePage {
   addressElement: HTMLInputElement = null;
 
   listSearch: string = '';
-
+  category:any;
   map: any;
   marker: any;
   loading: any;
@@ -31,7 +31,7 @@ export class HomePage {
   regionals: any = [];
   currentregional: any;
   circles: any = [];
-
+  socket:any = null;
   constructor(
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController,
@@ -45,7 +45,8 @@ export class HomePage {
     public geolocation: Geolocation,
     public http:Http
   ) {
-    this.platform.ready().then(() => this.loadMaps());
+    this.platform.ready().then(() =>
+      this.loadMaps());
     this.regionals = [{
       "title": "Marker 1",
       "latitude": 52.50094,
@@ -55,6 +56,19 @@ export class HomePage {
       "latitude": 49.1028606,
       "longitude": 9.8426116
     }];
+    /*this.socket = io('http://localhost:3000');
+    this.socket.on('newco2', (msg) => {
+      console.log("message", msg);
+
+    });
+    this.socket.on('newparking', (msg) => {
+      console.log("message", msg);
+
+    });
+    this.socket.on('newpeople', (msg) => {
+      console.log("message", msg);
+
+    });*/
   }
 
   viewPlace(id) {
@@ -382,8 +396,60 @@ export class HomePage {
     }
     this.addCircleparquing(positions,observations);
   }
+  getpositionpeople(pos,observations){
 
+    let positions = [];
+    for(let i = 0; i<pos.length;i++){
+      let posi=pos[i].split(" ");
+      positions[i]= new google.maps.LatLng(posi[0],posi[1]);
+    }
+    this.addCirclepeople(positions,observations);
+  }
 
+  addCirclepeople(positions,level) {
+    for (let i = 0; i < this.circles.length; i++) {
+      this.circles[i].setMap(null);
+    }
+    for (let i = 0; i < positions.length; i++) {
+
+      if (level[i] >= 0 && level[i] < 700) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#5ff442',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#5ff442',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 50
+        });
+      }
+      if (level[i] >= 700 && level[i] < 1500) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#f77707',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f77707',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 50
+        });
+      }
+      if (level[i] > 1500) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 50
+        });
+      }
+    }
+  }
 
   addCircleaire(positions,level) {
     for (let i = 0; i < this.circles.length; i++) {
@@ -501,7 +567,8 @@ export class HomePage {
   }
 
   getallaire(){
-      this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+    this.category="Air Quality";
+      this.http.get('http://10.192.53.5:3500/air/sensor/6772696769746f').map(res=>res.json()).subscribe(result=>{
         var locations = [];
         let observations=[];
         for (let i=0;i<result.sensors.length;i++){
@@ -514,7 +581,8 @@ export class HomePage {
   }
 
   getallparquing(){
-    this.http.get('http://10.192.53.5:3500/parking/6d61736d69').map(res=>res.json()).subscribe(result=>{
+    this.category="Parking Metrics";
+    this.http.get('http://10.192.53.5:3500/parking/sensor/6d61736d69').map(res=>res.json()).subscribe(result=>{
       var locations = [];
       let observations=[];
       for (let i=0;i<result.sensors.length;i++){
@@ -526,6 +594,20 @@ export class HomePage {
     });
   }
 
+  getallpeople(){
+    this.category="People Flow";
+    this.http.get('http://10.192.53.5:3500/people/sensor/706174616461').map(res=>res.json()).subscribe(result=>{
+      var locations = [];
+      let observations=[];
+      for (let i=0;i<result.sensors.length;i++){
+        locations[i] = result.sensors[i].observations[0].location;
+        observations[i]=result.sensors[i].observations[0].value;
+      }
+      this.getpositionpeople(locations,observations);
+      this.switch = "map";
+    });
+  }
+
   addInfoWindow(marker, content) {
     let infoWindow = new google.maps.InfoWindow({
       content: content
@@ -534,6 +616,27 @@ export class HomePage {
     google.maps.event.addListener(marker, 'click', () => {
       infoWindow.open(this.map, marker);
     });
+  }
+  filterpark(number){
+    this.geolocation.getCurrentPosition().then(
+      (position) => {
+          let data = { lat: position.coords.latitude, long: position.coords.longitude };
+        this.http.post('http://10.192.53.5:3500/nearParking',data).map(res=>res.json()).subscribe(result=>{
+          console.log(result)
+          /*var locations = [];
+          let observations=[];
+          for (let i=0;i<number;i++){
+            locations[i] = result.sensors[i].observations[0].location;
+            observations[i]=result.sensors[i].observations[0].value;
+          }
+          this.getpositionparquing(locations,observations);
+          this.switch = "map";*/
+        });
+      },
+      (error) => {
+
+        });
+
   }
 
 }
