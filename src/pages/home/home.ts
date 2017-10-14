@@ -149,7 +149,8 @@ export class HomePage {
     console.log("empiezo a seguir posicion")
 
     const watch = this.geolocation.watchPosition().subscribe(pos => {
-      console.log('lat: ' + pos.coords.latitude + ', lon: ' + pos.coords.longitude);
+      var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+      this.marker.setPosition(latlng);
     });
   }
 
@@ -363,96 +364,128 @@ export class HomePage {
     }
   }
 
-  getposition(pos){
+  getpositionaire(pos,observations){
 
     let positions = [];
     for(let i = 0; i<pos.length;i++){
       let posi=pos[i].split(" ");
       positions[i]= new google.maps.LatLng(posi[0],posi[1]);
     }
-    this.addCircle(positions);
+    this.addCircleaire(positions,observations);
+  }
+  getpositionparquing(pos,observations){
+
+    let positions = [];
+    for(let i = 0; i<pos.length;i++){
+      let posi=pos[i].split(" ");
+      positions[i]= new google.maps.LatLng(posi[0],posi[1]);
+    }
+    this.addCircleparquing(positions,observations);
   }
 
-  /*
-  * addCircle(positions){
 
-    for(let i = 0;i<this.circles.length;i++){
+
+  addCircleaire(positions,level) {
+    for (let i = 0; i < this.circles.length; i++) {
       this.circles[i].setMap(null);
     }
+    for (let i = 0; i < positions.length; i++) {
 
-   for(let i = 0; i<positions.length;i++){
-
-     this.circles[i] = new google.maps.Circle({
-       strokeColor: '#FF0000',
-       strokeOpacity: 0.8,
-       strokeWeight: 2,
-       fillColor: '#FF0000',
-       fillOpacity: 0.35,
-       map: this.map,
-       center: positions[i],
-       radius: 250
-     });
-   }
-
-  }
-  *
-  * */
-
-  addCircle(position,level){
-    let posi=position.split(" ");
-    let pos= new google.maps.LatLng(posi[0],posi[1]);
-    if(level>=350&&level<1000){
-      var cityCircle = new google.maps.Circle({
-        strokeColor: '#5ff442',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#5ff442',
-        fillOpacity: 0.35,
-        map: this.map,
-        center: pos,
-        radius: 250
-      });
-    }
-    if(level>=1000&&level<2000){
-      var cityCircle = new google.maps.Circle({
-        strokeColor: '#f7f71b',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#f7f71b',
-        fillOpacity: 0.35,
-        map: this.map,
-        center: pos,
-        radius: 250
-      });
-    }
-    if(level>=2000&&level<5000){
-      var cityCircle = new google.maps.Circle({
-        strokeColor: '#f77707',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#f77707',
-        fillOpacity: 0.35,
-        map: this.map,
-        center: pos,
-        radius: 250
-      });
-    }
-    if(level>5000) {
-      var cityCircle = new google.maps.Circle({
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
-        map: this.map,
-        center: pos,
-        radius: 250
-      });
+      if (level[i] >= 350 && level[i] < 1000) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#5ff442',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#5ff442',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
+      if (level[i] >= 1000 && level[i] < 2000) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#f7f71b',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f7f71b',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
+      if (level[i] >= 2000 && level[i] < 5000) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#f77707',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f77707',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
+      if (level[i] > 5000) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
     }
   }
 
+  addCircleparquing(positions,level) {
+    for (let i = 0; i < this.circles.length; i++) {
+      this.circles[i].setMap(null);
+    }
+    for (let i = 0; i < positions.length; i++) {
 
-
+      if (level[i] >= 30) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#5ff442',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#5ff442',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
+      if (level[i] <= 30 && level[i] > 10) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#f7f71b',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#f7f71b',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
+      if (level[i] <= 10) {
+        this.circles[i] = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: this.map,
+          center: positions[i],
+          radius: 250
+        });
+      }
+    }
+  }
   addMarker(position, content) {
 
     let marker = new google.maps.Marker({
@@ -461,40 +494,34 @@ export class HomePage {
       position: position
     });
 
+    this.marker = marker;
+
     this.addInfoWindow(marker, content);
     return marker;
   }
 
   getallaire(){
       this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+        var locations = [];
+        let observations=[];
         for (let i=0;i<result.sensors.length;i++){
-          this.addCircle(result.sensors[i].observations[0].location,result.sensors[i].observations[0].value);
+          locations[i] = result.sensors[i].observations[0].location;
+          observations[i]=result.sensors[i].observations[0].value;
         }
+        this.getpositionaire(locations,observations);
+        this.switch = "map";
       });
   }
-  /*
-  * getallaire(){
-    console.log("aire cogido");
-    this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
-      var locations = [];
-      for (let i=0;i<result.sensors.length;i++){
-        locations[i] = result.sensors[i].observations[0].location;
-      }
-      this.getposition(locations);
-      this.switch = "map"
-    });
-  }
-  *
-  * */
 
   getallparquing(){
-    console.log("parquing cogido");
     this.http.get('http://10.192.53.5:3500/parking/6d61736d69').map(res=>res.json()).subscribe(result=>{
       var locations = [];
+      let observations=[];
       for (let i=0;i<result.sensors.length;i++){
         locations[i] = result.sensors[i].observations[0].location;
+        observations[i]=result.sensors[i].observations[0].value;
       }
-      this.getposition(locations);
+      this.getpositionparquing(locations,observations);
       this.switch = "map"
     });
   }
