@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      SmartCitie
+      SmartCity
     </ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)='toggleSearch()'>
@@ -31,13 +31,10 @@
   <div [hidden]="!(switch == 'list')">
     <ion-list>
       <ion-item>
-        <h2 (click)="getallaire()">Test</h2>
+        <h2 (click)="getallaire()">Contaminación Aire</h2>
       </ion-item>
       <ion-item>
-        <h2>Test</h2>
-      </ion-item>
-      <ion-item>
-        <h2>Test</h2>
+        <h2 (click)="getallparquing()">Parquing disponible</h2>
       </ion-item>
     </ion-list>
   </div>

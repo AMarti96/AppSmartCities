@@ -53,10 +53,6 @@ export class HomePage {
       "latitude": 52.50094,
       "longitude": 13.29922,
     }, {
-      "title": "Marker 3",
-      "latitude": 52.50010,
-      "longitude": 13.29922,
-    }, {
       "title": "Marker 2",
       "latitude": 49.1028606,
       "longitude": 9.8426116
@@ -125,7 +121,7 @@ export class HomePage {
         zoom: 10
       };
       this.map.setOptions(options);
-      this.addMarker(location, "Mein gesuchter Standort");
+      this.addMarker(location, this.addressElement);
 
     });
   }
@@ -155,7 +151,7 @@ export class HomePage {
       var mapEle = this.mapElement.nativeElement;
       this.map = new google.maps.Map(mapEle, {
         zoom: 10,
-        center: { lat: 51.165691, lng: 10.451526 },
+        center: { lat: 41.378866, lng: 2.150188 },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         disableDoubleClickZoom: false,
         disableDefaultUI: true,
@@ -163,7 +159,7 @@ export class HomePage {
         scaleControl: true,
       });
       this.getCurrentPosition();
-      let markers = [];
+      /*let markers = [];
       for (let regional of this.regionals) {
         regional.distance = 0;
         regional.visible = false;
@@ -227,7 +223,7 @@ export class HomePage {
             textColor: '#fff'
           }
         ]
-      });
+      });*/
 
 
 
@@ -235,8 +231,7 @@ export class HomePage {
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
         google.maps.event.trigger(this.map, 'resize');
         mapEle.classList.add('show-map');
-        this.bounceMap(markers);
-        this.getCurrentPositionfromStorage(markers)
+        //this.bounceMap(markers);
       });
 
       google.maps.event.addListener(this.map, 'bounds_changed', () => {
@@ -265,24 +260,6 @@ export class HomePage {
     setTimeout(() => {
       google.maps.event.trigger(this.map, 'resize');
     }, 200);
-  }
-
-  getCurrentPositionfromStorage(markers) {
-    this.storage.get('lastLocation').then((result) => {
-      if (result) {
-        let myPos = new google.maps.LatLng(result.lat, result.long);
-        this.map.setOptions({
-          center: myPos,
-          zoom: 14
-        });
-        let marker = this.addMarker(myPos, "My last saved Location: " + result.location);
-
-        markers.push(marker);
-        this.bounceMap(markers);
-
-        this.resizeMap();
-      }
-    });
   }
 
   showToast(message) {
@@ -344,7 +321,6 @@ export class HomePage {
 
           this.showToast('Location found!');
 
-          console.log(position.coords.latitude, position.coords.longitude);
           let myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
           let options = {
             center: myPos,
@@ -360,11 +336,10 @@ export class HomePage {
             fillOpacity: 0.35,
             map: this.map,
             center: myPos,
-            radius: 500
+            radius: 250
           });
                   let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
                   this.storage.set('lastLocation', lastLocation).then(() => {
-                    console.log(lastLocation);
                   });
 
         });
@@ -396,6 +371,20 @@ export class HomePage {
 
     this.addInfoWindow(marker, content);
     return marker;
+  }
+
+  getallaire(){
+    console.log("aire cogido")
+    //this.http.get('http://10.193.44.74:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+    //console.log(result)
+    //});
+  }
+
+  getallparquing(){
+    console.log("parquing cogido")
+    //this.http.get('http://10.193.44.74:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+    //console.log(result)
+    //});
   }
 
   addInfoWindow(marker, content) {
