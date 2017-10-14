@@ -26,7 +26,7 @@ export class HomePage {
   search: boolean = false;
   error: any;
   switch: string = "map";
-
+  location:any;
   regionals: any = [];
   currentregional: any;
 
@@ -157,7 +157,7 @@ export class HomePage {
         zoomControl: true,
         scaleControl: true,
       });
-
+      this.getCurrentPosition();
       let markers = [];
       for (let regional of this.regionals) {
         regional.distance = 0;
@@ -347,27 +347,10 @@ export class HomePage {
           };
           this.map.setOptions(options);
           this.addMarker(myPos, "Mein Standort!");
-
-          let alert = this.alertCtrl.create({
-            title: 'Location',
-            message: 'Do you want to save the Location?',
-            buttons: [
-              {
-                text: 'Cancel'
-              },
-              {
-                text: 'Save',
-                handler: data => {
                   let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
-                  console.log(lastLocation);
                   this.storage.set('lastLocation', lastLocation).then(() => {
-                    this.showToast('Location saved');
+                    console.log(lastLocation);
                   });
-                }
-              }
-            ]
-          });
-          alert.present();
 
         });
       },
