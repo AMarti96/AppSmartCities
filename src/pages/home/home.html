@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      SmartCitie
     </ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)='toggleSearch()'>
@@ -43,7 +43,7 @@
   </div>
 
   <div class="map" [class.hidemap]="!((switch == 'map') || error)">
-    <ion-searchbar #searchbar placeholder="Suchen" [hidden]="!search"></ion-searchbar>
+    <ion-searchbar #searchbar placeholder="Buscar" [hidden]="!search"></ion-searchbar>
     <div id="map" #map></div>
   </div>
 </ion-content>
