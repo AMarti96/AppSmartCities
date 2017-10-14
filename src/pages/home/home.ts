@@ -352,19 +352,57 @@ export class HomePage {
     }
   }
 
-  addCircle(position){
+  addCircle(position,level){
     let posi=position.split(" ");
     let pos= new google.maps.LatLng(posi[0],posi[1]);
-    var cityCircle = new google.maps.Circle({
-      strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#FF0000',
-      fillOpacity: 0.35,
-      map: this.map,
-      center: pos,
-      radius: 250
-    });
+    if(level>=350&&level<1000){
+      var cityCircle = new google.maps.Circle({
+        strokeColor: '#5ff442',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#5ff442',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: pos,
+        radius: 250
+      });
+    }
+    if(level>=1000&&level<2000){
+      var cityCircle = new google.maps.Circle({
+        strokeColor: '#f7f71b',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#f7f71b',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: pos,
+        radius: 250
+      });
+    }
+    if(level>=2000&&level<5000){
+      var cityCircle = new google.maps.Circle({
+        strokeColor: '#f77707',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#f77707',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: pos,
+        radius: 250
+      });
+    }
+    if(level>5000) {
+      var cityCircle = new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: pos,
+        radius: 250
+      });
+    }
   }
 
   addMarker(position, content) {
@@ -380,11 +418,11 @@ export class HomePage {
   }
 
   getallaire(){
-    this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
-      for (let i=0;i<result.sensors.length;i++){
-        this.addCircle(result.sensors[i].observations[0].location);
-      }
-    });
+      this.http.get('http://10.192.53.5:3500/air/6772696769746f').map(res=>res.json()).subscribe(result=>{
+        for (let i=0;i<result.sensors.length;i++){
+          this.addCircle(result.sensors[i].observations[0].location,result.sensors[i].observations[0].value);
+        }
+      });
   }
 
   getallparquing(){
