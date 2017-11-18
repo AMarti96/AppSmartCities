@@ -687,6 +687,7 @@ export class HomePage {
     this.parking=true;
     this.category="Parking Metrics";
     this.http.get('http://'+this.url+'/parking/sensor/park_meter').map(res=>res.json()).subscribe(result=>{
+      console.log(result);
       var locations = [];
       let observations=[];
       for (let i=0;i<result.length;i++){
